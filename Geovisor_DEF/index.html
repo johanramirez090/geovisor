@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>GeoVisor - Comuna 20</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Estilos Leaflet y complementos -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-measure@3.1.0/dist/leaflet-measure.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css" />
+  <link rel="stylesheet" href="estilos.css" />
+
+  <!-- Exportar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Título superior -->
+  <div id="map-title">Acceso y movilidad en la comuna 20 de Cali</div>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+
+  <!-- Botón flotante de mapa base -->
+  <button id="basemap-btn" title="Cambiar mapa base">
+    <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" alt="Mapas base">
+  </button>
+
+  <!-- Panel de selección de mapas base -->
+  <div id="basemap-panel">
+    <h4>Mapas Base</h4>
+    <ul>
+      <li data-map="osm">🗺️ Calles (OSM)</li>
+      <li data-map="satellite">🛰️ Satélite</li>
+      <li data-map="topo">🗻 Topográfico</li>
+      <li data-map="carto">🏙️ Carto Light</li>
+    </ul>
+  </div>
+
+  <!-- Coordenadas -->
+  <div id="coords">Latitud: -- | Longitud: --</div>
+
+  <!-- Flecha norte -->
+  <div id="north-arrow-svg">
+    <svg width="40" height="40" viewBox="0 0 100 100">
+      <polygon points="50,10 60,40 50,30 40,40" fill="#d00" stroke="#333" stroke-width="4"/>
+      <text x="50%" y="85%" dominant-baseline="middle" text-anchor="middle" font-size="28" fill="#333">N</text>
+    </svg>
+  </div>
+
+  <!-- Botón metadatos -->
+  <button id="metadata-btn" title="Ver metadatos">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <circle cx="12" cy="12" r="10" fill="#378ec9"/>
+      <text x="12" y="16" text-anchor="middle" font-size="14" fill="white" font-family="Arial" font-weight="bold">i</text>
+    </svg>
+  </button>
+
+  <!-- Botón compartir -->
+  <button id="share-btn" class="leaflet-bar leaflet-control leaflet-control-custom" title="Compartir mapa">
+    <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Compartir" width="24" height="24">
+  </button>
+
+  <!-- BOTÓN FLOTANTE DE CICLOVÍA -->
+  <button id="ciclovia-btn" title="Agregar reporte de ciclovía">
+    🚲
+  </button>
+
+  <!-- FORMULARIO MODAL -->
+  <div id="ciclovia-form" class="modal">
+  <div class="modal-content">
+    <h3>Nuevo reporte de ciclovía</h3>
+
+<label>Tipo de reporte:</label>
+<select id="tipo-reporte">
+  <option value="Conexión necesaria con ciclovía existente">Conexión necesaria con ciclovía existente</option>
+  <option value="Cruce peligroso">Cruce peligroso</option>
+  <option value="Falta señalización para ciclistas">Falta señalización para ciclistas</option>
+  <option value="Ciclovía sugerida">Ciclovía sugerida</option>
+</select>
+
+<br><br>
+
+<label>Observaciones (opcional):</label><br>
+<textarea id="descripcion-reporte" rows="3" cols="40" placeholder="Ej: Es un cruce muy transitado y peligroso..."></textarea>
+
+<br><br>
+<button onclick="activarSeleccion()">📍 Seleccionar ubicación</button>
+<button onclick="enviarReporte()">✅ Enviar</button>
+<button onclick="cerrarFormulario()">❌ Cancelar</button>
+
+  </div>
+</div>
+
+
+  <!-- Librerías JavaScript -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+  <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+  <script src="https://unpkg.com/leaflet-measure@3.1.0/dist/leaflet-measure.js"></script>
+  <script src="https://unpkg.com/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.js"></script>
+
+  <!-- Script principal -->
+  <script src="visor.js"></script>
+</body>
+</html>
