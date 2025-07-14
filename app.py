@@ -6,6 +6,8 @@ import json
 app = Flask(__name__)
 CORS(app)  # Permite llamadas desde el visor web
 
+
+
 # === CONEXIÓN A POSTGRESQL ===
 def get_connection():
     return psycopg2.connect(
@@ -15,6 +17,7 @@ def get_connection():
         password="P",
         port=5432
     )
+
 
 # === RUTA 1: Agregar nuevo reporte ===
 @app.route("/agregar_reporte", methods=["POST"])
@@ -61,7 +64,7 @@ def cargar_barrios():
     try:
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT id_barrio, nombre FROM barrios ORDER BY nombre")
+        cur.execute("SELECT id_barrio, barrio FROM barrios ORDER BY barrio")
         rows = cur.fetchall()
         cur.close()
         conn.close()

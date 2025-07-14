@@ -1,5 +1,8 @@
 // === Restricción del mapa ===
 const boundsCali = L.latLngBounds([3.32, -76.62], [3.52, -76.45]);
+const urlApi =  "https://42f88df37612.ngrok-free.app";
+const urlGeoserver =  "http://35.169.213.173:8080";
+// const urlGeoserver =  "http://localhost:8080";
 const map = L.map('map', {
     center: [3.4190, -76.5630],
     zoom: 14,
@@ -36,7 +39,8 @@ document.querySelectorAll('#basemap-panel li').forEach(item => {
 });
 
 // === Capas WMS ===
-const url = "http://localhost:8080/geoserver/Movilidad_y_acceso_COMUNA_20/wms";
+// const url = "http://localhost:8080/geoserver/Movilidad_y_acceso_COMUNA_20/wms";
+const url = urlGeoserver+"/geoserver/Movilidad_y_acceso_COMUNA_20/wms";
 const capaBarrios = L.tileLayer.wms(url, { layers: 'Movilidad_y_acceso_COMUNA_20:barrios', format: 'image/png', transparent: true });
 const capaComuna = L.tileLayer.wms(url, { layers: 'Movilidad_y_acceso_COMUNA_20:comuna', format: 'image/png', transparent: true });
 const capaEncuestas = L.tileLayer.wms(url, { layers: 'Movilidad_y_acceso_COMUNA_20:encuestas_de_movilidad', format: 'image/png', transparent: true });
@@ -105,7 +109,7 @@ document.getElementById("metadata-btn").addEventListener("click", () => {
             <b>Nombre:</b> GeoVisor de acceso y movilidad en la comuna 20 de la ciudad Santiago de Cali<br><br>
             <b>Autores:</b> Giselly Daniela Molina, Angie Vanesa Sepúlveda, Johan Camilo Ramírez<br><br>
             <b>Fecha de creación:</b> Julio 2025<br><br>
-            <b>Escala:</b> 1:5000<br><br>
+            <b>Escala:</b> 1:5080<br><br>
             <b>Cobertura geográfica:</b> Comuna 20 de Santiago de Cali<br><br>
             <b>CRS:</b> WGS 84 (EPSG:4326)<br><br>
             <b>Norma:</b> ISO 19115<br><br>
@@ -147,12 +151,14 @@ L.control.measure({
 }).addTo(map);
 
 // === MiniMap ===
-fetch('geojson/ciudad.geojson')
+fetch('/geojson/ciudad.geojson')
     .then(res => res.json())
     .then(data => {
         const capaCiudad = L.geoJSON(data, {
   style: { color: '#1b00b1ff', weight: 2, fillOpacity: 0.1 }
 });
+
+//const capaBarrios = L.tileLayer.wms(url, { layers: 'Movilidad_y_acceso_COMUNA_20:barrios', format: 'image/png', transparent: true });
 
 const miniMapBase = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 
@@ -216,7 +222,7 @@ function enviarReporte() {
     return;
   }
 
-  fetch("http://127.0.0.1:5000/agregar_reporte", {
+  fetch(urlApi+"/agregar_reporte", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -246,7 +252,8 @@ function enviarReporte() {
 let capaReportes = null;
 
 function cargarReportes() {
-  fetch("http://127.0.0.1:5000/reportes_geojson")
+  // http://35.169.213.173/
+  fetch(urlApi+"/reportes_geojson")
     .then(res => res.json())
     .then(data => {
       if (capaReportes) map.removeLayer(capaReportes);
@@ -282,7 +289,7 @@ function cargarReportes() {
 function eliminarReporte(id) {
   if (!confirm(`¿Estás seguro de eliminar el reporte ${id}?`)) return;
 
-  fetch(`http://127.0.0.1:5000/eliminar_reporte/${id}`, {
+  fetch(urlApi+`/eliminar_reporte/${id}`, {
     method: "DELETE"
   })
     .then(res => res.json())
@@ -302,7 +309,7 @@ function editarReporte(id) {
     return;
   }
 
-  fetch(`http://127.0.0.1:5000/actualizar_reporte/${id}`, {
+  fetch(urlApi+`/actualizar_reporte/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -348,12 +355,13 @@ map.on('layeradd', function () {
       { nombre: "Transporte Masivo (SITM)", layerName: "Movilidad_y_acceso_COMUNA_20:sistema_integrado_transporte_masivo" },
       { nombre: "Encuestas de Movilidad", layerName: "Movilidad_y_acceso_COMUNA_20:encuestas_de_movilidad" }
     ];
-
+    
     capasConLeyenda.forEach(capa => {
+      let urlCapa = urlGeoserver+"/geoserver/Movilidad_y_acceso_COMUNA_20/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER="+capa.layerName;
       leyenda.innerHTML += `
         <div style="margin: 6px 0;">
           <div><strong>${capa.nombre}</strong></div>
-          <img src="http://localhost:8080/geoserver/Movilidad_y_acceso_COMUNA_20/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=${capa.layerName}" 
+          <img src="${urlCapa}" 
                alt="Leyenda ${capa.nombre}" 
                style="max-width: 180px; border:1px solid #ccc; background:#fff; padding:2px; border-radius:4px;" />
         </div>
